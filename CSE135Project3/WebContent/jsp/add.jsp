@@ -24,8 +24,7 @@
 			ProductWithCategoryName p = new ProductWithCategoryName(id,
 					name, cname, sku, price);
 			cart.addToShoppingCart(quantity, p);
-			out.println(HelperUtils
-					.printSuccess("Product added to shopping cart"));
+			out.println(HelperUtils.printSuccess("Product added to shopping cart"));
 		} catch (Exception e) {
 
 		}

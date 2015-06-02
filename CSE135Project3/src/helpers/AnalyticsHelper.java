@@ -39,6 +39,18 @@ import javax.servlet.http.HttpServletRequest;
 	        return table;
 		}
 		
+		/** QUERIES FOR PRECOMPUTED TABLES**/
+		
+		
+		/** CREATE TABLE analytics_col_headers(id serial NOT NULL, pid integer, pname text, total integer DEFAULT 0, CONSTRAINT analytics_col_headers_pkey PRIMARY KEY (id)) 
+		 * 
+		 * CREATE TABLE analytics_row_headers( id serial NOT NULL, sid integer, sname text, total integer, CONSTRAINT analytics_row_headers_pkey PRIMARY KEY (id))
+		 * 
+		 * CREATE TABLE analytics_prod_x_state(id serial NOT NULL, pid integer, sid integer, total integer, CONSTRAINT analytics_prod_x_state_pkey PRIMARY KEY (id))
+		 **/
+		
+		/**END QUERIES**/
+		
 		private void createTempTables() throws SQLException{
 			Statement stmt = null;
 			stmt = conn.createStatement();

@@ -20,6 +20,12 @@
 	AnalyticsHelper analyzer = new AnalyticsHelper(request);
 	TableHelper itemTable = analyzer.submitQuery(request);
 %>
+<div id="precompute">
+	<form name="precompute_data" action="precompute" method="post">
+		<button type="submit">Precompute Tables</button>
+	</form>
+</div>
+
 <div id="dropdowns">
 	<form name="query_form" action="analytics" method="post">
 		<label for="categories_dropdown"></label>
@@ -35,7 +41,7 @@
 			<% } %>
 		<% } %>
 		</select>
-		<button type="submit">Run Query</button>
+		<button type="submit">Refresh</button>
 	</form>
 	
 </div>
