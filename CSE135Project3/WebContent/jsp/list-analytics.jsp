@@ -41,9 +41,9 @@
 			<% } %>
 		<% } %>
 		</select>
-		<button type="submit">Refresh</button>
+		<button type="submit">Submit</button>
 	</form>
-	
+	<button>Refresh</button>
 </div>
 <div id="table">
 <%if (itemTable != null){ %>

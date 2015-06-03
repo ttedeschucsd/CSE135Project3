@@ -11,6 +11,42 @@ import javax.servlet.http.HttpServletRequest;
 
 public class CategoriesHelper {
 
+	
+	public static void updatePrecomputedTable(){
+		Connection conn = null;
+        Statement stmt = null;
+        Statement stmt2 = null;
+        ResultSet rs = null;
+        ResultSet rc = null;
+        try{
+        	try {
+        		conn = HelperUtils.connect();
+        	} catch (Exception e) {
+        		// TODO Auto-generated catch block
+        		e.printStackTrace();
+        	}
+        	ArrayList<String> categoryNames = new ArrayList<String>();
+			stmt = conn.createStatement();
+			String query = "SELECT name FROM Categories";
+	        rs = stmt.executeQuery(query);
+	        while (rs.next()) {
+	        	categoryNames.add(rs.getString(1));
+	        }
+	        
+	        for(int i=0; i<categoryNames.size(); i++){
+	        	stmt2 = conn.createStatement();
+	        	String secquery = "ALTER TABLE analytics_row_headers ADD COLUMN \"total_by_" + categoryNames.get(i) + "\" integer NOT NULL DEFAULT 0";
+	        	stmt2.execute(secquery);
+	        }
+	        
+	        
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+	}
+	
+	
     public static List<CategoryWithCount> listCategories() {
         Connection conn = null;
         Statement stmt = null;
