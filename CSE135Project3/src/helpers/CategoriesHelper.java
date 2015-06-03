@@ -25,17 +25,17 @@ public class CategoriesHelper {
         		// TODO Auto-generated catch block
         		e.printStackTrace();
         	}
-        	ArrayList<String> categoryNames = new ArrayList<String>();
+        	ArrayList<Integer> categoryIDs = new ArrayList<Integer>();
 			stmt = conn.createStatement();
-			String query = "SELECT name FROM Categories";
+			String query = "SELECT id FROM Categories";
 	        rs = stmt.executeQuery(query);
 	        while (rs.next()) {
-	        	categoryNames.add(rs.getString(1));
+	        	categoryIDs.add(rs.getInt(1));
 	        }
 	        
-	        for(int i=0; i<categoryNames.size(); i++){
+	        for(int i=0; i<categoryIDs.size(); i++){
 	        	stmt2 = conn.createStatement();
-	        	String secquery = "ALTER TABLE analytics_row_headers ADD COLUMN \"total_by_" + categoryNames.get(i) + "\" integer NOT NULL DEFAULT 0";
+	        	String secquery = "ALTER TABLE analytics_row_headers ADD COLUMN \"total_by_cat_id_" + categoryIDs.get(i) + "\" integer NOT NULL DEFAULT 0";
 	        	stmt2.execute(secquery);
 	        }
 	        
