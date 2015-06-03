@@ -88,6 +88,8 @@ public class CategoriesHelper {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
+        ResultSet rKeys = null;
+        Integer lastID = 0;
         try {
             try {
                 conn = HelperUtils.connect();
@@ -121,7 +123,11 @@ public class CategoriesHelper {
                         + "');";
                 try {
                     conn.setAutoCommit(false);
-                    stmt.execute(SQL_1);
+                    stmt.executeUpdate(SQL_1, Statement.RETURN_GENERATED_KEYS);
+                    rKeys = stmt.getGeneratedKeys();
+                    while(rKeys.next()){
+                    	lastID = rKeys.getInt(1);
+                    }
                     conn.commit();
                     conn.setAutoCommit(true);
                     stmt.close();

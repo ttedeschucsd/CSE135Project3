@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 		
 		
 		public TableHelper submitQuery(HttpServletRequest request){
-			CategoriesHelper.updatePrecomputedTable();
 //	        try{
 //	        	try {
 //	                conn = HelperUtils.connect();
