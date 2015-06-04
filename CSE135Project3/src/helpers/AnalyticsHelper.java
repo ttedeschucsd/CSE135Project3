@@ -130,14 +130,14 @@ import javax.servlet.http.HttpServletRequest;
 		private void getRowHeaders() throws SQLException{
 			ResultSet rows = null;
 			Statement stmt = null;
-			stmt = conn.createStatement();
-			String insert, select, group, tables, query;
-			insert = "INSERT INTO row_headers(soruid, soruname, stateid, userid, total)";
 			
-			select = "(SELECT s.id, s.name, s.id, u.id, SUM(sa.price*sa.quantity) ";
+			stmt = conn.createStatement();
+			String select, group, tables, query;
+			
+			select = "SELECT s.id, s.name, s.id, u.id, SUM(sa.price*sa.quantity) ";
 			tables = "FROM states as s LEFT JOIN users as u ON s.id = u.state LEFT JOIN sales as sa ON u.id = sa.uid ";
 			group = " s.id, u.id ";
-			query = insert + select + tables + "GROUP BY" + group + "ORDER BY sum DESC NULLS LAST" + ")";
+			query =  select + tables + "GROUP BY" + group + "ORDER BY sum DESC NULLS LAST" + ")";
 			stmt.execute(query);
 			query = "SELECT * FROM row_headers";
 			rows = stmt.executeQuery(query);
@@ -154,14 +154,17 @@ import javax.servlet.http.HttpServletRequest;
 			ResultSet cols = null;
 			Statement stmt = null;
 			
-			String insert, select, group, query, where;			
+			
+			String query;			
 			stmt = conn.createStatement();
 
 			query = "SELECT pid, pname, total FROM analytics_col_headers ";
 			
 			if(categoriesItem != null){
-				query += " LEFT JOIN products as p on p.id = pid "
-						+ "LEFT JOIN categories as c on p.cid = c.id WHERE c.id = " + categoriesItem + " ";
+				if(categoriesItem != ""){
+					query += " LEFT JOIN products as p on p.id = pid "
+							+ "LEFT JOIN categories as c on p.cid = c.id WHERE c.id = " + categoriesItem + " ";
+				}
 			}
 			
 			query += "ORDER BY total DESC NULLS LAST LIMIT 50";

@@ -31,7 +31,7 @@
 	<form name="query_form" action="analytics" method="post">
 		<label for="categories_dropdown"></label>
 		<select name="categories_dropdown">
-			<option value = "0">All Categories</option>
+			<option value="">All Categories</option>
 		<%
         	for (CategoryWithCount cwc : categories) {
         %>
