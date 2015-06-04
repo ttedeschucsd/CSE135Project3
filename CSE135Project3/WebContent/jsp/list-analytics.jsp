@@ -31,7 +31,7 @@
 	<form name="query_form" action="analytics" method="post">
 		<label for="categories_dropdown"></label>
 		<select name="categories_dropdown">
-			<option value="">All Categories</option>
+			<option value = "0">All Categories</option>
 		<%
         	for (CategoryWithCount cwc : categories) {
         %>
@@ -59,15 +59,25 @@
 			<% } %>
 		</tr>
 		<% 
-			int size = itemTable.colHeaders.size()+1;
+			int size = itemTable.colHeaders.size();
 			for(Header row : itemTable.rowHeaders){ 
 		%>
 			<tr>
 				<td><b><%= row.name %></b> (<%= row.total %>)</td>
 				<%
-					for(int i=1; i<size; i++){
+					for(Header col : itemTable.colHeaders){
+						RowCol newRC = new RowCol(row.id, col.id);
+						//System.out.println("row: " + row.id + " col: " + col.id);
+						RowCol testRC = new RowCol(41, 406);
+						//System.out.println("newRC row: " + newRC.state_id);
+						//System.out.println("newRC col: " + newRC.prod_id);
+						//System.out.println("in hashmap? " + itemTable.items.containsKey(testRC));
+						if(itemTable.itemTotals.containsKey(newRC)){
 				%>
-					<td><%= itemTable.itemTotals[row.id][i] %></td>
+					<td><%= itemTable.itemTotals.get(newRC) %></td>
+					<%} else {%>
+					<td>0</td>
+					<%} %>
 				<% } %>
 			</tr>
 		<% } %>
