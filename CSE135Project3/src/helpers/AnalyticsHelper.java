@@ -1,12 +1,20 @@
 	package helpers;
 
 	import java.sql.Connection;
-	import java.sql.ResultSet;
-	import java.sql.SQLException;
-	import java.sql.Statement;
-	import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 
-	import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+
 
 	public class AnalyticsHelper {
 		public String categoriesItem, tempRow, tempCol;
@@ -273,5 +281,27 @@
 				table.addItem(items.getInt(3), items.getInt(2), items.getInt(4));
 			}
 			return;
+		}
+		
+		public void parseJSONString(String tableString){
+			try {
+				JSONParser jP = new JSONParser();
+				JSONObject obj;
+				obj = (JSONObject) jP.parse(tableString);
+				JSONObject colHeadObj = (JSONObject) obj.get("colHeads");
+				JSONObject rowHeadObj = (JSONObject) obj.get("rowHeads");
+				JSONObject itemObj = (JSONObject) obj.get("items");
+					
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+//				JSONObject tableObject = new JSONObject(tableString);
+//				JSONArray colHeadsArray = tableObject.getJSONArray("colHeaders");
+//				JSONArray rowHeadsArray = tableObject.getJSONArray("rowHeaders");
+//				JSONArray itemsArray = tableObject.getJSONArray("items");
+				// TODO Auto-generated catch block
 		}
 }
