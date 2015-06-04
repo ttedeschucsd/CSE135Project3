@@ -31,7 +31,7 @@
 	<form name="query_form" action="analytics" method="post">
 		<label for="categories_dropdown"></label>
 		<select name="categories_dropdown">
-			<option value="">All Categories</option>
+			<option value = "0">All Categories</option>
 		<%
         	for (CategoryWithCount cwc : categories) {
         %>
@@ -45,36 +45,42 @@
 		<input type="hidden" name="action" value="run">
 		<button type="submit">Run</button>
 	</form>
-	<button id="refresh">Refresh</button>
+	<button>Refresh</button>
 </div>
 <div id="table">
 <%if (itemTable != null){ %>
-	<table id="analytics-table">
-		<thead>
+	<table>
+		<tr>
+			<td>     </td>
+			<% 
+				for(Header col : itemTable.colHeaders){ 
+			%>
+				<td><b><%= (col.name.length() < 10) ? col.name : col.name.substring(0,9) %></b> (<%= col.total%>)</td>
+			<% } %>
+		</tr>
+		<% 
+			int size = itemTable.colHeaders.size();
+			for(Header row : itemTable.rowHeaders){ 
+		%>
 			<tr>
-				<td class="blank">     </td>
-				<% 
-					for(Header col : itemTable.colHeaders){ 
+				<td><b><%= row.name %></b> (<%= row.total %>)</td>
+				<%
+					for(Header col : itemTable.colHeaders){
+						RowCol newRC = new RowCol(row.id, col.id);
+						//System.out.println("row: " + row.id + " col: " + col.id);
+						RowCol testRC = new RowCol(41, 406);
+						//System.out.println("newRC row: " + newRC.state_id);
+						//System.out.println("newRC col: " + newRC.prod_id);
+						//System.out.println("in hashmap? " + itemTable.items.containsKey(testRC));
+						if(itemTable.itemTotals.containsKey(newRC)){
 				%>
-					<td class="col_header" data-id="" data-total=""><b><%= (col.name.length() < 10) ? col.name : col.name.substring(0,9) %></b> (<%= col.total%>)</td>
+					<td><%= itemTable.itemTotals.get(newRC) %></td>
+					<%} else {%>
+					<td>0</td>
+					<%} %>
 				<% } %>
 			</tr>
-		</thead>
-		<tbody>
-			<% 
-				int size = itemTable.colHeaders.size()+1;
-				for(Header row : itemTable.rowHeaders){ 
-			%>
-				<tr>
-					<td class="row_header" data-id="" data-total=""><b><%= row.name %></b> (<%= row.total %>)</td>
-					<%
-						for(int i=1; i<size; i++){
-					%>
-						<td data-pid="" data-sid="" data-total=""><%= itemTable.itemTotals[row.id][i] %></td>
-					<% } %>
-				</tr>
-			<% } %>
-		</tbody>
+		<% } %>
 	</table>
 <% } %>
 	<br />

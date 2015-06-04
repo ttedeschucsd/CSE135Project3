@@ -15,15 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 		private Connection conn;
 		
 		public AnalyticsHelper(HttpServletRequest request){
-			categoriesItem = "0";
 	        categoriesItem = request.getParameter("categories_dropdown");	//All Categories(0)
 	        action = request.getParameter("action");
 		}
 		
 		
-		public TableHelper submitQuery(HttpServletRequest request){
-			table = new TableHelper();
-			
+		public TableHelper submitQuery(HttpServletRequest request) throws SQLException{
 			try {
                 conn = HelperUtils.connect();
             } catch (Exception e) {
@@ -33,29 +30,31 @@ import javax.servlet.http.HttpServletRequest;
 			if(action != null){
 				switch(action){
 					case "precompute":
-						//precomputeData();
+						precomputeData();
 					break;
 					
 					case "run":
-						try {
-							fillTable();
-//			                getColHeaders();
-//			                getRowHeaders();
-//			                getAllItems();
-			            } catch (Exception e) {
-			                System.err.println("Internal Server Error. This shouldn't happen.");
-			            }
+						System.out.println("----Entering case run----");
+						System.out.println("categoriesItem: " + categoriesItem);
+						fillTable();
 					break;
 				}
-			} else{
-				try {
-	                getColHeaders();
-//	                getRowHeaders();
-//	                getAllItems();
-	            } catch (Exception e) {
-	                System.err.println("Internal Server Error. This shouldn't happen.");
-	            }
 			}
+			conn.close();
+//	        try{
+//	        	try {
+//	                conn = HelperUtils.connect();
+//	            } catch (Exception e) {
+//	                System.err.println("Internal Server Error. This shouldn't happen.");
+//	                return null;
+//	            }
+//	        	createTempTables();
+//	            getRowHeaders();
+//	            getColHeaders();
+//	            getAllItems();
+//	        } catch(Exception e){
+//	        	System.err.println("Query failed");
+//	        }
 	        
 	        return table;
 		}
@@ -66,13 +65,14 @@ import javax.servlet.http.HttpServletRequest;
 			ResultSet rows = null;
 			ResultSet cols = null;
 			ResultSet items = null;
-			table = new TableHelper();
+			//TableHelper tableNew = new TableHelper();
 			
 			try{
 				stmt = conn.createStatement();
 			if(categoriesItem.equalsIgnoreCase("0")){
+				table = new TableHelper();
 				System.out.println("---Entering categoriesItem == 0");
-				String row_all_query = "SELECT sid, sname, total FROM analytics_row_headers_all LIMIT BY 50";
+				String row_all_query = "SELECT sid, sname, total FROM analytics_row_headers_all";
 				rows = stmt.executeQuery(row_all_query);
 				while (rows.next()) {
 	            	Integer id = rows.getInt(1);
@@ -80,7 +80,7 @@ import javax.servlet.http.HttpServletRequest;
 	                Integer total = rows.getInt(3);
 	                table.addRowHeader(new Header(id, name, total));
 	            }			
-				String col_all_query = "SELECT pid, pname, total FROM analytics_col_headers LIMIT BY 50";
+				String col_all_query = "SELECT pid, pname, total FROM analytics_col_headers";
 				cols = stmt.executeQuery(col_all_query);
 				while (cols.next()){
 					Integer id = cols.getInt(1);
@@ -88,14 +88,20 @@ import javax.servlet.http.HttpServletRequest;
 					Integer total = cols.getInt(3);
 					table.addColHeader(new Header(id, name, total));
 				}
-				String items_query = "SELECT pid, sid, total FROM analytics_prod_x_state";
+				String items_query = "SELECT sid, pid, total FROM analytics_prod_x_state";
 				items = stmt.executeQuery(items_query);
 				while(items.next()){
-					table.addItem(items.getInt(2), items.getInt(1), items.getInt(3)); 
+					//table.addItem(items.getInt(2), items.getInt(1), items.getInt(3)); 
+					System.out.println(items.getInt(1) + "," + items.getInt(2) + "," + items.getInt(3));
+					//Put stuff into itemTotals hashmap of table
+					table.addItem(items.getInt(1), items.getInt(2), items.getInt(3));
 				}
+				int s = 32;
+				int p = 500;
+				RowCol rc = new RowCol(s, p);
+				System.out.println("checking plz work yo: " + table.itemTotals.get(rc));
 				
 			} else {
-				
 			}
 			} catch (SQLException e){
 				e.printStackTrace();
@@ -174,14 +180,14 @@ import javax.servlet.http.HttpServletRequest;
 		private void getRowHeaders() throws SQLException{
 			ResultSet rows = null;
 			Statement stmt = null;
-			
 			stmt = conn.createStatement();
-			String select, group, tables, query;
+			String insert, select, group, tables, query;
+			insert = "INSERT INTO row_headers(soruid, soruname, stateid, userid, total)";
 			
-			select = "SELECT s.id, s.name, s.id, u.id, SUM(sa.price*sa.quantity) ";
+			select = "(SELECT s.id, s.name, s.id, u.id, SUM(sa.price*sa.quantity) ";
 			tables = "FROM states as s LEFT JOIN users as u ON s.id = u.state LEFT JOIN sales as sa ON u.id = sa.uid ";
 			group = " s.id, u.id ";
-			query =  select + tables + "GROUP BY" + group + "ORDER BY sum DESC NULLS LAST" + ")";
+			query = insert + select + tables + "GROUP BY" + group + "ORDER BY sum DESC NULLS LAST" + ")";
 			stmt.execute(query);
 			query = "SELECT * FROM row_headers";
 			rows = stmt.executeQuery(query);
@@ -198,26 +204,28 @@ import javax.servlet.http.HttpServletRequest;
 			ResultSet cols = null;
 			Statement stmt = null;
 			
-			String query;			
+			String insert, select, group, query, where;			
 			stmt = conn.createStatement();
 
-			query = "SELECT pid, pname, total FROM analytics_col_headers ";
+			insert = "INSERT INTO col_headers(pid, pname, total)";
+			select = "(SELECT p.id, p.name, SUM(sa.price*sa.quantity) FROM products as p LEFT JOIN sales as sa on sa.pid = p.id ";
+			group = "GROUP BY p.name, p.id ";
+			where = "";
 			
-			if(categoriesItem != null){
-				if(categoriesItem != ""){
-					query += " LEFT JOIN products as p on p.id = pid "
-							+ "LEFT JOIN categories as c on p.cid = c.id WHERE c.id = " + categoriesItem + " ";
-				}
+			if(!categoriesItem.equals("0")){
+				select += "LEFT JOIN categories as c on p.cid = c.id ";
+				where = "WHERE c.id = " + categoriesItem + " ";
 			}
 			
-			query += "ORDER BY total DESC NULLS LAST LIMIT 50";
+			query = insert + select + where + group + "ORDER BY sum DESC NULLS LAST LIMIT 50" + ")";
 			stmt.execute(query);
+			query = "SELECT * FROM col_headers";
 			cols = stmt.executeQuery(query);
 			while (cols.next()){
-            	Integer pid = cols.getInt(1);
-            	String name = cols.getString(2);
-            	Integer total = cols.getInt(3);
-            	table.addColHeader(new Header(pid, name, total));
+            	Integer id = cols.getInt(1);
+            	String name = cols.getString(3);
+            	Integer total = cols.getInt(4);
+            	table.addColHeader(new Header(id, name, total));
             }
 			return;
 		}
