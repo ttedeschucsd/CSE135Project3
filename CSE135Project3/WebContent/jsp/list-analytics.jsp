@@ -21,8 +21,9 @@
 	TableHelper itemTable = analyzer.submitQuery(request);
 %>
 <div id="precompute">
-	<form name="precompute_data" action="precompute" method="post">
-		<button type="submit">Precompute Tables</button>
+	<form name="precompute_data" action="analytics" method="post">
+		<input type="hidden" name="action" value="precompute">
+		<button type="submit">Pre-Compute Tables</button>
 	</form>
 </div>
 
@@ -41,7 +42,8 @@
 			<% } %>
 		<% } %>
 		</select>
-		<button type="submit">Submit</button>
+		<input type="hidden" name="action" value="run">
+		<button type="submit">Run</button>
 	</form>
 	<button>Refresh</button>
 </div>

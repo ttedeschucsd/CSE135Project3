@@ -4,23 +4,40 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 	public class AnalyticsHelper {
-		public String rowsItem, categoriesItem, orderingItem, tempRow, tempCol;
-		public String limitColEnd, limitRowEnd, rowoffset, coloffset;
+		public String categoriesItem, tempRow, tempCol;
+		public String limitColEnd, limitRowEnd, rowoffset, coloffset, action;
 		public TableHelper table;
 		private Connection conn;
 		
 		public AnalyticsHelper(HttpServletRequest request){
-			rowsItem = request.getParameter("rows_dropdown");	//Customers(1) or States(2)
 	        categoriesItem = request.getParameter("categories_dropdown");	//All Categories(0)
-	        orderingItem = request.getParameter("orders_dropdown");	//How the data should be ordered
+	        action = request.getParameter("action");
 		}
 		
 		
 		public TableHelper submitQuery(HttpServletRequest request){
+			try {
+                conn = HelperUtils.connect();
+            } catch (Exception e) {
+                System.err.println("Internal Server Error. This shouldn't happen.");
+                return null;
+            }
+			if(action != null){
+				switch(action){
+					case "precompute":
+						precomputeData();
+					break;
+					
+					case "run":
+						
+					break;
+				}
+			}
 //	        try{
 //	        	try {
 //	                conn = HelperUtils.connect();
@@ -39,21 +56,64 @@ import javax.servlet.http.HttpServletRequest;
 	        return table;
 		}
 		
-		/** QUERIES FOR PRECOMPUTED TABLES**/
-		
-		
-		/**
-		 * CREATE TABLE analytics_col_headers(id serial NOT NULL, pid integer, pname text, total integer DEFAULT 0, CONSTRAINT analytics_col_headers_pkey PRIMARY KEY (id)) 
-		 * 
-		 * CREATE TABLE analytics_row_headers( id serial NOT NULL, sid integer, sname text, total integer, CONSTRAINT analytics_row_headers_pkey PRIMARY KEY (id))
-		 * 
-		 * CREATE TABLE analytics_prod_x_state(id serial NOT NULL, pid integer, sid integer, total integer, CONSTRAINT analytics_prod_x_state_pkey PRIMARY KEY (id))
-		 * 
-		 *  
-		 **/
-		
-		/**END QUERIES**/
-		
+		private void precomputeData(){
+			Statement stmt = null;
+			int categoryId = 0;
+			
+			String row_all_query = "INSERT INTO analytics_row_headers_all(sid, sname, total)"
+					+ "("
+					+ 	"SELECT s.id, s.name, SUM(sa.price*sa.quantity) "
+					+ 	"FROM states as s "
+					+ 	"LEFT JOIN users as u ON s.id = u.state "
+					+ 	"LEFT JOIN sales as sa ON u.id = sa.uid "
+					+ 	"GROUP BY s.id "
+					+ 	"ORDER BY sum DESC NULLS LAST"
+					+ ")";
+			
+			String col_query = "INSERT INTO analytics_col_headers(pid, pname, total)"
+					+ "("
+					+ 	"SELECT p.id, p.name, SUM(sa.price*sa.quantity) "
+					+ 	"FROM products as p "
+					+ 	"LEFT JOIN sales as sa on sa.pid = p.id "
+					+ 	"GROUP BY p.name, p.id "
+					+ 	"ORDER BY sum DESC NULLS LAST"
+					+ ")";
+			String prod_x_state_query = "INSERT INTO analytics_prod_x_state(pid, sid, total)"
+					+ "("
+					+ 	"SELECT p.id, s.id, SUM(sa.price*sa.quantity) as total "
+					+ 	"FROM sales as sa "
+					+ 	"LEFT JOIN users as u ON sa.uid = u.id "
+					+ 	"LEFT JOIN states as s ON u.state = s.id "
+					+ 	"LEFT JOIN products as p ON sa.pid = p.id "
+					+ 	"GROUP BY p.id, s.id"
+					+ ")";
+			
+			try {
+				stmt = conn.createStatement();
+				stmt.execute(row_all_query);
+				List<CategoryWithCount> cats = CategoriesHelper.listCategories();
+				for (CategoryWithCount cwc : cats) {
+					String row_cat_query = "INSERT INTO analytics_row_headers_by_category(sid, sname, cid, total)"
+							+ "("
+							+ 	"SELECT s.id, s.name, c.id, SUM(sa.price*sa.quantity) "
+							+ 	"FROM states as s "
+							+ 	"LEFT JOIN users as u ON s.id = u.state "
+							+ 	"LEFT JOIN sales as sa ON u.id = sa.uid "
+							+ 	"LEFT JOIN products as p on sa.pid = p.id "
+							+ 	"LEFT JOIN categories as c ON p.cid = c.id "
+							+ 	"WHERE c.id = " + cwc.getId()
+							+ 	" GROUP BY s.id, c.id "
+							+ 	"ORDER BY sum DESC NULLS LAST"
+							+ ")";
+					stmt.execute(row_cat_query);
+				}
+				stmt.execute(col_query);
+				stmt.execute(prod_x_state_query);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		private void createTempTables() throws SQLException{
 			Statement stmt = null;
