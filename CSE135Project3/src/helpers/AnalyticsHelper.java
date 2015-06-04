@@ -15,12 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 		private Connection conn;
 		
 		public AnalyticsHelper(HttpServletRequest request){
+			categoriesItem = "0";
 	        categoriesItem = request.getParameter("categories_dropdown");	//All Categories(0)
 	        action = request.getParameter("action");
 		}
 		
 		
 		public TableHelper submitQuery(HttpServletRequest request){
+			table = new TableHelper();
+			
 			try {
                 conn = HelperUtils.connect();
             } catch (Exception e) {
@@ -30,28 +33,28 @@ import javax.servlet.http.HttpServletRequest;
 			if(action != null){
 				switch(action){
 					case "precompute":
-						precomputeData();
+						//precomputeData();
 					break;
 					
 					case "run":
-						
+						try {
+			                getColHeaders();
+//			                getRowHeaders();
+//			                getAllItems();
+			            } catch (Exception e) {
+			                System.err.println("Internal Server Error. This shouldn't happen.");
+			            }
 					break;
 				}
+			} else{
+				try {
+	                getColHeaders();
+//	                getRowHeaders();
+//	                getAllItems();
+	            } catch (Exception e) {
+	                System.err.println("Internal Server Error. This shouldn't happen.");
+	            }
 			}
-//	        try{
-//	        	try {
-//	                conn = HelperUtils.connect();
-//	            } catch (Exception e) {
-//	                System.err.println("Internal Server Error. This shouldn't happen.");
-//	                return null;
-//	            }
-//	        	createTempTables();
-//	            getRowHeaders();
-//	            getColHeaders();
-//	            getAllItems();
-//	        } catch(Exception e){
-//	        	System.err.println("Query failed");
-//	        }
 	        
 	        return table;
 		}
@@ -154,25 +157,21 @@ import javax.servlet.http.HttpServletRequest;
 			String insert, select, group, query, where;			
 			stmt = conn.createStatement();
 
-			insert = "INSERT INTO col_headers(pid, pname, total)";
-			select = "(SELECT p.id, p.name, SUM(sa.price*sa.quantity) FROM products as p LEFT JOIN sales as sa on sa.pid = p.id ";
-			group = "GROUP BY p.name, p.id ";
-			where = "";
+			query = "SELECT pid, pname, total FROM analytics_col_headers ";
 			
-			if(!categoriesItem.equals("0")){
-				select += "LEFT JOIN categories as c on p.cid = c.id ";
-				where = "WHERE c.id = " + categoriesItem + " ";
+			if(categoriesItem != null){
+				query += " LEFT JOIN products as p on p.id = pid "
+						+ "LEFT JOIN categories as c on p.cid = c.id WHERE c.id = " + categoriesItem + " ";
 			}
 			
-			query = insert + select + where + group + "ORDER BY sum DESC NULLS LAST LIMIT 50" + ")";
+			query += "ORDER BY total DESC NULLS LAST LIMIT 50";
 			stmt.execute(query);
-			query = "SELECT * FROM col_headers";
 			cols = stmt.executeQuery(query);
 			while (cols.next()){
-            	Integer id = cols.getInt(1);
-            	String name = cols.getString(3);
-            	Integer total = cols.getInt(4);
-            	table.addColHeader(new Header(id, name, total));
+            	Integer pid = cols.getInt(1);
+            	String name = cols.getString(2);
+            	Integer total = cols.getInt(3);
+            	table.addColHeader(new Header(pid, name, total));
             }
 			return;
 		}
