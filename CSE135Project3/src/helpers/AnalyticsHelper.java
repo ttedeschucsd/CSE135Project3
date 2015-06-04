@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 			if(action != null){
 				switch(action){
 					case "precompute":
-						precomputeData();
+						//precomputeData();
 					break;
 					
 					case "run":

@@ -4,5 +4,6 @@
     
 <%
 	AnalyticsHelper analyzer = new AnalyticsHelper(request);
-	TableHelper itemTable = analyzer.submitQuery(request);
+	String requestString = request.toString();
+	System.out.println(requestString);
 %>

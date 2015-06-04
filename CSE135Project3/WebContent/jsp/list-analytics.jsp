@@ -30,7 +30,7 @@
 <div id="dropdowns">
 	<form name="query_form" action="analytics" method="post">
 		<label for="categories_dropdown"></label>
-		<select name="categories_dropdown">
+		<select name="categories_dropdown" id="category">
 			<option value = "0">All Categories</option>
 		<%
         	for (CategoryWithCount cwc : categories) {
@@ -45,25 +45,27 @@
 		<input type="hidden" name="action" value="run">
 		<button type="submit">Run</button>
 	</form>
-	<button>Refresh</button>
+	<button id="refresh">Refresh</button>
 </div>
 <div id="table">
 <%if (itemTable != null){ %>
 	<table>
 		<tr>
-			<td>     </td>
+			<td class ="blank">     </td>
 			<% 
+				int count = 1;
 				for(Header col : itemTable.colHeaders){ 
 			%>
-				<td><b><%= (col.name.length() < 10) ? col.name : col.name.substring(0,9) %></b> (<%= col.total%>)</td>
+				<td class="col-header" data-pid="<%=col.id%>" data-total="<%=col.total%>" data-colid="<%=count++%>"><b><%= (col.name.length() < 10) ? col.name : col.name.substring(0,9) %></b> (<%= col.total%>)</td>
 			<% } %>
 		</tr>
 		<% 
 			int size = itemTable.colHeaders.size();
+			count = 1;
 			for(Header row : itemTable.rowHeaders){ 
 		%>
 			<tr>
-				<td><b><%= row.name %></b> (<%= row.total %>)</td>
+				<td class="row-header" data-sid="<%=row.id%>" data-total="<%=row.total%>" data-rowid=<%=count++%>><b><%= row.name %></b> (<%= row.total %>)</td>
 				<%
 					for(Header col : itemTable.colHeaders){
 						RowCol newRC = new RowCol(row.id, col.id);
@@ -74,7 +76,7 @@
 						//System.out.println("in hashmap? " + itemTable.items.containsKey(testRC));
 						if(itemTable.itemTotals.containsKey(newRC)){
 				%>
-					<td><%= itemTable.itemTotals.get(newRC) %></td>
+					<td class="item" data-pid="<%=newRC.prod_id%>" data-sid="<%=newRC.state_id%>"><%= itemTable.itemTotals.get(newRC) %></td>
 					<%} else {%>
 					<td>0</td>
 					<%} %>
