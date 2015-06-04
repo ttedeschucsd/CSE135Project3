@@ -72,7 +72,7 @@ import javax.servlet.http.HttpServletRequest;
 			if(categoriesItem.equalsIgnoreCase("0")){
 				table = new TableHelper();
 				System.out.println("---Entering categoriesItem == 0");
-				String row_all_query = "SELECT sid, sname, total FROM analytics_row_headers_all";
+				String row_all_query = "SELECT sid, sname, total FROM analytics_row_headers_all LIMIT 50";
 				rows = stmt.executeQuery(row_all_query);
 				while (rows.next()) {
 	            	Integer id = rows.getInt(1);
@@ -80,7 +80,7 @@ import javax.servlet.http.HttpServletRequest;
 	                Integer total = rows.getInt(3);
 	                table.addRowHeader(new Header(id, name, total));
 	            }			
-				String col_all_query = "SELECT pid, pname, total FROM analytics_col_headers";
+				String col_all_query = "SELECT pid, pname, total FROM analytics_col_headers LIMIT 50";
 				cols = stmt.executeQuery(col_all_query);
 				while (cols.next()){
 					Integer id = cols.getInt(1);
@@ -88,21 +88,43 @@ import javax.servlet.http.HttpServletRequest;
 					Integer total = cols.getInt(3);
 					table.addColHeader(new Header(id, name, total));
 				}
-				String items_query = "SELECT sid, pid, total FROM analytics_prod_x_state";
-				items = stmt.executeQuery(items_query);
-				while(items.next()){
-					//table.addItem(items.getInt(2), items.getInt(1), items.getInt(3)); 
-					System.out.println(items.getInt(1) + "," + items.getInt(2) + "," + items.getInt(3));
-					//Put stuff into itemTotals hashmap of table
-					table.addItem(items.getInt(1), items.getInt(2), items.getInt(3));
-				}
-				int s = 32;
-				int p = 500;
-				RowCol rc = new RowCol(s, p);
-				System.out.println("checking plz work yo: " + table.itemTotals.get(rc));
 				
 			} else {
+				table = new TableHelper();
+				System.out.println("----Entering categoiesItem == " + categoriesItem);
+				String row_one_query = "SELECT sid, sname, total FROM analytics_row_headers_by_category WHERE cid = " + categoriesItem;
+				System.out.println("rows query: " + row_one_query);
+				rows = stmt.executeQuery(row_one_query);
+				while (rows.next()) {
+	            	Integer id = rows.getInt(1);
+	                String name = rows.getString(2);
+	                Integer total = rows.getInt(3);
+	                table.addRowHeader(new Header(id, name, total));
+	            }	
+				String col_one_query = "SELECT ac.pid, ac.pname, ac.total FROM analytics_col_headers as ac, products p WHERE "
+						+ "ac.pid = p.id AND p.cid = " + categoriesItem + "LIMIT 50";
+				System.out.println("cols query: " + col_one_query);
+				cols = stmt.executeQuery(col_one_query);
+				while (cols.next()){
+					Integer id = cols.getInt(1);
+					String name = cols.getString(2);
+					Integer total = cols.getInt(3);
+					table.addColHeader(new Header(id, name, total));
+				}
+				
 			}
+			String items_one_query = "SELECT sid, pid, total FROM analytics_prod_x_state";
+			items = stmt.executeQuery(items_one_query);
+			while(items.next()){
+				//table.addItem(items.getInt(2), items.getInt(1), items.getInt(3)); 
+				System.out.println(items.getInt(1) + "," + items.getInt(2) + "," + items.getInt(3));
+				//Put stuff into itemTotals hashmap of table
+				table.addItem(items.getInt(1), items.getInt(2), items.getInt(3));
+			}
+			int s = 32;
+			int p = 500;
+			RowCol rc = new RowCol(s, p);
+			System.out.println("checking plz work yo: " + table.itemTotals.get(rc));
 			} catch (SQLException e){
 				e.printStackTrace();
 			}
