@@ -38,7 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 					
 					case "run":
 						try {
-			                getColHeaders();
+							fillTable();
+//			                getColHeaders();
 //			                getRowHeaders();
 //			                getAllItems();
 			            } catch (Exception e) {
@@ -58,6 +59,49 @@ import javax.servlet.http.HttpServletRequest;
 	        
 	        return table;
 		}
+		
+		
+		private void fillTable() throws SQLException{
+			Statement stmt = null;
+			ResultSet rows = null;
+			ResultSet cols = null;
+			ResultSet items = null;
+			table = new TableHelper();
+			
+			try{
+				stmt = conn.createStatement();
+			if(categoriesItem.equalsIgnoreCase("0")){
+				System.out.println("---Entering categoriesItem == 0");
+				String row_all_query = "SELECT sid, sname, total FROM analytics_row_headers_all LIMIT BY 50";
+				rows = stmt.executeQuery(row_all_query);
+				while (rows.next()) {
+	            	Integer id = rows.getInt(1);
+	                String name = rows.getString(2);
+	                Integer total = rows.getInt(3);
+	                table.addRowHeader(new Header(id, name, total));
+	            }			
+				String col_all_query = "SELECT pid, pname, total FROM analytics_col_headers LIMIT BY 50";
+				cols = stmt.executeQuery(col_all_query);
+				while (cols.next()){
+					Integer id = cols.getInt(1);
+					String name = cols.getString(2);
+					Integer total = cols.getInt(3);
+					table.addColHeader(new Header(id, name, total));
+				}
+				String items_query = "SELECT pid, sid, total FROM analytics_prod_x_state";
+				items = stmt.executeQuery(items_query);
+				while(items.next()){
+					table.addItem(items.getInt(2), items.getInt(1), items.getInt(3)); 
+				}
+				
+			} else {
+				
+			}
+			} catch (SQLException e){
+				e.printStackTrace();
+			}
+		}
+		
 		
 		private void precomputeData(){
 			Statement stmt = null;
@@ -153,7 +197,6 @@ import javax.servlet.http.HttpServletRequest;
 		private void getColHeaders() throws SQLException{
 			ResultSet cols = null;
 			Statement stmt = null;
-			
 			
 			String query;			
 			stmt = conn.createStatement();

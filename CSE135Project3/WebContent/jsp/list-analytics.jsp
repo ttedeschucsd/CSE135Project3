@@ -45,32 +45,36 @@
 		<input type="hidden" name="action" value="run">
 		<button type="submit">Run</button>
 	</form>
-	<button>Refresh</button>
+	<button id="refresh">Refresh</button>
 </div>
 <div id="table">
 <%if (itemTable != null){ %>
-	<table>
-		<tr>
-			<td>     </td>
-			<% 
-				for(Header col : itemTable.colHeaders){ 
-			%>
-				<td><b><%= (col.name.length() < 10) ? col.name : col.name.substring(0,9) %></b> (<%= col.total%>)</td>
-			<% } %>
-		</tr>
-		<% 
-			int size = itemTable.colHeaders.size()+1;
-			for(Header row : itemTable.rowHeaders){ 
-		%>
+	<table id="analytics-table">
+		<thead>
 			<tr>
-				<td><b><%= row.name %></b> (<%= row.total %>)</td>
-				<%
-					for(int i=1; i<size; i++){
+				<td class="blank">     </td>
+				<% 
+					for(Header col : itemTable.colHeaders){ 
 				%>
-					<td><%= itemTable.itemTotals[row.id][i] %></td>
+					<td class="col_header" data-id="" data-total=""><b><%= (col.name.length() < 10) ? col.name : col.name.substring(0,9) %></b> (<%= col.total%>)</td>
 				<% } %>
 			</tr>
-		<% } %>
+		</thead>
+		<tbody>
+			<% 
+				int size = itemTable.colHeaders.size()+1;
+				for(Header row : itemTable.rowHeaders){ 
+			%>
+				<tr>
+					<td class="row_header" data-id="" data-total=""><b><%= row.name %></b> (<%= row.total %>)</td>
+					<%
+						for(int i=1; i<size; i++){
+					%>
+						<td data-pid="" data-sid="" data-total=""><%= itemTable.itemTotals[row.id][i] %></td>
+					<% } %>
+				</tr>
+			<% } %>
+		</tbody>
 	</table>
 <% } %>
 	<br />
