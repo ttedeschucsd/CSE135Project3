@@ -4,7 +4,8 @@ $(document).ready(function(){
 		  var rowHeaders = {};
 		  var colHeaders = {};
 		  var items = {};
-		  var category = 0
+		  var table = {};
+		  var category = 0;
 		  category = $('#category').val();
 		  console.log(category);
 		
@@ -44,21 +45,26 @@ $(document).ready(function(){
 		console.log("rowHeaders: ", rowHeaders);
 		console.log("colHeaders: ", colHeaders);
 		console.log("items: ", items);
-		$.ajax({
-			url: "jsp/ajax_analytics.jsp",
-			method: "POST",
-			data: { rowHeads : rowHeaders,
-					colHeads : colHeaders,
-					items : items,
-					cat : category
-            },
-            //dataType : "json",
-			success : function(msg){      
-	            console.log("msg", msg);
-			},
-	        error : function(XMLHttpRequest, textStatus, errorThrown){
-	        	console.log("request", XMLHttpRequest);
-	        },
-		});
+		
+		table = {
+    			colHeads : colHeaders,
+    			rowHeads : rowHeaders,
+    			items : items
+    	}
+		
+		var xmlHttp;
+    	xmlHttp = new XMLHttpRequest();
+    	var responseHandler = function(){
+    		if(xmlHttp.readyState == 4){
+    			document.getElementById("res").innerHTML = xmlHttp.responseText;
+    		}
+    	}
+    	
+    	tableString = JSON.stringify(table);
+    	console.log(tableString);
+        xmlHttp.onreadystatechange=responseHandler;
+        xmlHttp.open("POST","jsp/ajax_analytics.jsp?table=" + tableString,true);
+        xmlHttp.send(null);
+        
 	});
 })

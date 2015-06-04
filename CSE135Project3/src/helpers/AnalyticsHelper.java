@@ -1,12 +1,12 @@
 	package helpers;
 
 	import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.Statement;
+	import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+	import javax.servlet.http.HttpServletRequest;
 
 	public class AnalyticsHelper {
 		public String categoriesItem, tempRow, tempCol;

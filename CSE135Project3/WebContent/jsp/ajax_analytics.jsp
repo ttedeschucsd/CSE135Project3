@@ -1,9 +1,9 @@
 <%@page
-    import="java.util.List"
+    import="java.util.*"
     import="helpers.*"%>
     
 <%
 	AnalyticsHelper analyzer = new AnalyticsHelper(request);
-	String requestString = request.toString();
-	System.out.println(requestString);
+	String table = request.getParameter("table");
+	System.out.println(table);
 %>
