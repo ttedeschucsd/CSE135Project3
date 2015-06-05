@@ -8,6 +8,6 @@
 	
 	AnalyticsHelper analyzer = new AnalyticsHelper(request);
 	String table = request.getParameter("table");
-	analyzer.parseJSONString(table);
+	analyzer.parseJSONStringToTable(table);
 	System.out.println(table);
 %>

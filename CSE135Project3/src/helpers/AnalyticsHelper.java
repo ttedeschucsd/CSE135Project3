@@ -4,6 +4,7 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +20,7 @@ import org.json.simple.parser.ParseException;
 	public class AnalyticsHelper {
 		public String categoriesItem, tempRow, tempCol;
 		public String limitColEnd, limitRowEnd, rowoffset, coloffset, action;
-		public TableHelper table;
+		public TableHelper table, oldTable;
 		private Connection conn;
 		
 		public AnalyticsHelper(HttpServletRequest request){
@@ -283,25 +284,42 @@ import org.json.simple.parser.ParseException;
 			return;
 		}
 		
-		public void parseJSONString(String tableString){
+		public void parseJSONStringToTable(String tableString){
+			oldTable = new TableHelper();
 			try {
 				JSONParser jP = new JSONParser();
 				JSONObject obj;
 				obj = (JSONObject) jP.parse(tableString);
-				JSONObject colHeadObj = (JSONObject) obj.get("colHeads");
-				JSONObject rowHeadObj = (JSONObject) obj.get("rowHeads");
-				JSONObject itemObj = (JSONObject) obj.get("items");
-					
+				
+				JSONArray colHeadAry = (JSONArray)obj.get("colHeads");
+				JSONArray rowHeadAry = (JSONArray) obj.get("rowHeads");
+				JSONArray itemAry = (JSONArray) obj.get("items");
+				for(int i=0; i<colHeadAry.size(); i++){
+					JSONObject colHeadObj = (JSONObject) colHeadAry.get(i);
+					long colpid = (long) colHeadObj.get("pid");
+					long coltotal = (long) colHeadObj.get("total");
+					oldTable.addColHeader(new Header((int)colpid, "", (int)coltotal)); 
+				}
+				for(int i=0; i<rowHeadAry.size(); i++){
+					JSONObject rowHeadObj = (JSONObject) rowHeadAry.get(i);
+					long rowsid = (long) rowHeadObj.get("sid");
+					long rowstotal = (long) rowHeadObj.get("total");
+					oldTable.addRowHeader(new Header((int)rowsid, "", (int)rowstotal));
+				}
+				for(int i=0; i<itemAry.size(); i++){
+					JSONObject itemObj = (JSONObject) itemAry.get(i);
+					long itemsid = (long) itemObj.get("sid");
+					long itemspid = (long) itemObj.get("pid");
+					String itemstotal = (String) itemObj.get("total");
+					oldTable.addItem((int)itemsid, (int)itemspid, Integer.valueOf(itemstotal));
+				}
+				
+				
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			
-//				JSONObject tableObject = new JSONObject(tableString);
-//				JSONArray colHeadsArray = tableObject.getJSONArray("colHeaders");
-//				JSONArray rowHeadsArray = tableObject.getJSONArray("rowHeaders");
-//				JSONArray itemsArray = tableObject.getJSONArray("items");
-				// TODO Auto-generated catch block
+			//Compare the two tables here, first need to run queries to get newTable  (oldTable is old data)
 		}
 }

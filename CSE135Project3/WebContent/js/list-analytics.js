@@ -1,9 +1,9 @@
 $(document).ready(function(){
 	$('#refresh').click(function(){
 		  var row = {};
-		  var rowHeaders = {};
-		  var colHeaders = {};
-		  var items = {};
+		  var rowHeaders = [];
+		  var colHeaders = [];
+		  var items = [];
 		  var table = {};
 		  var category = 0;
 		  category = $('#category').val();
@@ -17,28 +17,25 @@ $(document).ready(function(){
 			    if($(this).attr("class") == "blank"){
 			    }
 			    else if($(this).attr("class") == "col-header"){
-			    	var key = $(this).data("pid");
-			    	console.log(key);
-			    	colHeaders[key] = {
+			    	colHeaders.push({
+			    		pid : $(this).data("pid"),
 			    		colIndex : $(this).data("colid"),
 			    		total : $(this).data("total")
-			    	}
-			    	console.log("col headers: ", colHeaders);
+			    	});
 			    } else if($(this).attr("class") == "row-header"){
-			    	var key = $(this).data("sid");
-			    	console.log(key);
-			    	rowHeaders[key] = {
+			    	rowHeaders.push({
+			    			sid : $(this).data("sid"),
 				    		rowIndex : $(this).data("rowid"),
 				    		total : $(this).data("total")
-				    }
+				    });
 			    	console.log("row headers: ", rowHeaders);
 			    } else if($(this).attr("class") == "item"){
 			    	var key = $(this).data("pid").toString() + "-" + $(this).data("sid").toString();
-			    	items[key] = {
+			    	items.push({
 			    		pid : $(this).data("pid"),
 			    		sid : $(this).data("sid"),
 			    		total : $(this).text(),
-			    	}
+			    	});
 			    }
 			 });
 		});
