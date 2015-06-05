@@ -30,19 +30,21 @@
         	else {
         		document.getElementById("ageError").innerHTML = "";
         	}
-        	if(name != null && name != "" && age != null && age >= 1){
-        		document.getElementById("res").innerHTML = "You have registered successfully";
+        	
+        	if(name != null && name != "" && age >= 1){
+        		duplicateUser();
         	}
         	return submitOK;
         }
-</script>
-<script type="text/javascript">       
+       
         function duplicateUser(){
         	console.log("Entering duplicateUser()!");
         	var xmlHttp = new XMLHttpRequest();
         	var responseHandler = function(){
         		if(xmlHttp.readyState == 4){
         			document.getElementById("res").innerHTML = xmlHttp.responseText;
+ 					console.log(xmlHttp.responseText);	
+ 		
         		}
         	}
         	xmlHttp.onreadystatechange=responseHandler;
@@ -68,14 +70,14 @@
                             <!--jsp:include page="/html/signup-form.html" /-->
                         </div>
                         <div class="container">
-                        <form name="f1" action="signup" method="post" onsubmit="return verify()">
+                        <form name="f1" action="signup" method="post" onsubmit="duplicateUser()">
                         	<table align="center">
                         		<tr><td></td>
                         			<td><span id="nameError" style="color:red"></span></td>
                         		</tr>
                         		<tr>
                         			<td>Name</td>
-                        			<td><input type="text" id="name" name="name" onblur="duplicateUser()"></td>
+                        			<td><input type="text" id="name" name="name"></td>
                         	
                         		</tr>
                         		<tr><td></td>
@@ -158,7 +160,7 @@
            		 				</tr>
            		 				
            		 				<tr>
-                					<td><input id="submitButton" type="submit" value="Signup"></td>
+                					<td><input onClick="verify();" type="button" value="Signup"></td>
             					</tr>
                         	</table>
                         </form>

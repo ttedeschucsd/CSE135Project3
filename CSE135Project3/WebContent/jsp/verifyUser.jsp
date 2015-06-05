@@ -1,5 +1,5 @@
 <%@ page import="java.sql.Connection" import="java.sql.ResultSet" import="java.sql.SQLException" import="java.sql.Statement"
-		 import="helpers.*"%>ß
+		 import="helpers.*"%>
 		 
 <% response.setContentType("text"); %>
 <% Connection conn = null;
@@ -19,16 +19,11 @@ Statement stmt = conn.createStatement();
 
 rc = stmt.executeQuery(query);
 while(rc.next()){
-	if(rc.getString(1).equals(name) && name.length() >= 1 && name != ""){
-		duplicate = true;
-		break;
-	}
+	if(rc.getString(1).equals(name) && name.length() >= 1){
+		duplicate = true;%>
+		User name not available
+	<%} 
 }
-
-if(duplicate == true){%>
-	User name is not available
-<%} else if(duplicate == false) {%>
-	User name available
-<%}
-
-%>
+if(duplicate == false){%>
+	You have successfully registered
+<%} %>
