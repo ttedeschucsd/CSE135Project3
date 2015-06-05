@@ -53,7 +53,7 @@ $(document).ready(function(){
     	xmlHttp = new XMLHttpRequest();
     	var responseHandler = function(){
     		if(xmlHttp.readyState == 4){
-    			document.getElementById("res").innerHTML = xmlHttp.responseText;
+    			updateText();
     		}
     	}
     	
@@ -64,4 +64,9 @@ $(document).ready(function(){
         xmlHttp.send(null);
         
 	});
+	
+	var updateText = function(){
+//		var colToUpdate = $('.col-header').data("pid", 1);
+//		colToUpdate.attr("style") = "text to red";
+	}
 })

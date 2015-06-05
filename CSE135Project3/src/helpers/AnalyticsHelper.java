@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -321,5 +322,58 @@ import org.json.simple.parser.ParseException;
 			}
 			
 			//Compare the two tables here, first need to run queries to get newTable  (oldTable is old data)
+			HttpServletRequest givenRequest = null;
+			try {
+				submitQuery(givenRequest);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			compareTables();
+			
+		}
+		
+		private void compareTables(){
+			for(Header oldCol : oldTable.colHeaders){
+				for(Header newCol : table.colHeaders){
+					if(oldCol.id == newCol.id){
+						if(oldCol.total == newCol.total){
+							break;
+						} else{
+							//diffs[0][oldCol.id] = newCol.total;
+							break;
+						}
+					}
+				}
+			}
+			
+			for(Header oldRow : oldTable.rowHeaders){
+				for(Header newRow : table.rowHeaders){
+					if(oldRow.id == newRow.id){
+						if(oldRow.total == newRow.total){
+							break;
+						} else{
+							//diffs[0][oldRow.id] = newRow.total;
+							break;
+						}
+					}
+				}
+			}
+			
+			    Iterator it = oldTable.itemTotals.entrySet().iterator();
+			    while (it.hasNext()) {
+			        Map.Entry pair = (Map.Entry)it.next();
+			        System.out.println(pair.getKey() + " = " + pair.getValue());
+			        int newTotal = table.itemTotals.get(pair.getKey());
+//			        if(newTotal != pair.getValue()){
+//			        	//Add to differences
+//			        }
+			        it.remove(); // avoids a ConcurrentModificationException
+			    }
+
+			
+			
 		}
 }
