@@ -4,9 +4,11 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -339,9 +341,12 @@ import org.json.simple.parser.ParseException;
 		}
 		
 		private String compareTables(){
-			String cols = "cols:[";
-			String rows = "rows:[";
-			String items = "items:[";
+			String cols = "\"cols\":[";
+			String rows = "\"rows\":[";
+			String items = "\"items\":[";
+			int colcount = 0;
+			int rowcount = 0;
+			int itemscount = 0;
 			for(Header oldCol : oldTable.colHeaders){
 				for(Header newCol : table.colHeaders){
 					if(oldCol.id == newCol.id){
@@ -349,6 +354,7 @@ import org.json.simple.parser.ParseException;
 							break;
 						} else{
 							cols += "{\"pid\":" + oldCol.id +  ", \"total\":" + newCol.total + "},";
+							colcount++;
 							break;
 						}
 					}
@@ -362,6 +368,7 @@ import org.json.simple.parser.ParseException;
 							break;
 						} else{
 							rows += "{\"sid\":" + oldRow.id +  ", \"total\":" + newRow.total + "},";
+							rowcount++;
 							break;
 						}
 					}
@@ -379,30 +386,23 @@ import org.json.simple.parser.ParseException;
 			    	if(newTotals.containsKey(o)){
 			    		int newTotal = newTotals.get(o);
 			    		if(newTotal != oldTotals.get(o)){
-			    			items += "[{\"pid\":" + o.prod_id + ",\"sid\":" + o.state_id + ", \"total\":" + newTotal + "},";
+			    			items += "{\"pid\":" + o.prod_id + ",\"sid\":" + o.state_id + ", \"total\":" + newTotal + "},";
+			    			itemscount++;
 			    		}
 			    	}
+			    }
+			    if(colcount>0){
+			    	cols = cols.replace(cols.substring(cols.length()-1), "");
+			    }
+			    if(rowcount>0){
+			    	rows = rows.replace(rows.substring(rows.length()-1), "");
+			    }
+			    if(itemscount>0){
+			    	items = items.replace(items.substring(items.length()-1), "");
 			    }
 			    
-			    /*for(Header oldRow : oldTable.rowHeaders){
-			    	for(Header oldCol : oldTable.colHeaders){
-			    		RowCol newRC = new RowCol(oldRow.id, oldCol.id);
-			    		if(table.itemTotals.containsKey(newRC)){
-			    			
-			    		}
-			    	}
-			    }
-			    while (it.hasNext()) {
-			        Map.Entry pair = (Map.Entry)it.next();
-			        System.out.println(pair.getKey() + " = " + pair.getValue());
-			        int newTotal = table.itemTotals.get(pair.getKey());
-//			        if(newTotal != pair.getValue()){
-//			        	//Add to differences
-//			        }
-			        it.remove(); // avoids a ConcurrentModificationException
-			    }*/
 
-			return cols + rows + items;
+			return ("{" + cols + "]," + rows + "]," + items +"]}").replaceAll("\\\\", "");
 			
 		}
 }

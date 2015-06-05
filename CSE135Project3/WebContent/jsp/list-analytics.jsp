@@ -56,7 +56,7 @@
 				int count = 1;
 				for(Header col : itemTable.colHeaders){ 
 			%>
-				<td class="col-header" data-pid="<%=col.id%>" data-total="<%=col.total%>" data-colid="<%=count++%>"><b><%= (col.name.length() < 10) ? col.name : col.name.substring(0,9) %></b> (<%= col.total%>)</td>
+				<td class="col-header" data-pid="<%=col.id%>" data-total="<%=col.total%>" data-colid="<%=count++%>" data-name="<%=col.name%>"><b><%= (col.name.length() < 10) ? col.name : col.name.substring(0,9) %></b> (<%= col.total%>)</td>
 			<% } %>
 		</tr>
 		<% 
@@ -65,7 +65,7 @@
 			for(Header row : itemTable.rowHeaders){ 
 		%>
 			<tr>
-				<td class="row-header" data-sid="<%=row.id%>" data-total="<%=row.total%>" data-rowid=<%=count++%>><b><%= row.name %></b> (<%= row.total %>)</td>
+				<td class="row-header" data-sid="<%=row.id%>" data-total="<%=row.total%>" data-rowid=<%=count++%> data-name="<%=row.name%>"><b><%= row.name %></b> (<%= row.total %>)</td>
 				<%
 					for(Header col : itemTable.colHeaders){
 						RowCol newRC = new RowCol(row.id, col.id);

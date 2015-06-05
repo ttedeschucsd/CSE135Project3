@@ -54,7 +54,26 @@ $(document).ready(function(){
     	xmlHttp = new XMLHttpRequest();
     	var responseHandler = function(){
     		if(xmlHttp.readyState == 4){
-    			updateText(xmlHttp.responseText);
+    			if(xmlHttp.status === 200){
+    				var obj = JSON.parse(xmlHttp.responseText);
+    				for(i=0; i< obj.cols.length; i++){
+    					var editCol = $(".col-header[data-pid='"+obj.cols[i].pid+"']");
+    					editCol.css('color', 'red');
+    					var name = editCol.data("name");
+    					editCol.html(name + " (" + obj.cols[i].total + ")");
+    				}
+    				for(i=0; i<obj.rows.length; i++){
+    					var editRow = $(".row-header[data-sid='"+obj.cols[i].pid+"']");
+    					editRow.css('color', 'red');
+    					var name = editRow.data("name");
+    					editRow.html(name + " (" + obj.rows[i].total + ")");
+    				}
+    				for(i=0; i<obj.items.length; i++){
+    					var editItem = $(".item[data-sid=" + obj.items[i].sid + "][data-pid=" + obj.items[i].pid + "]");
+    					editItem.css('color', 'red');
+    					editItem.html(obj.items[i].total);
+    				}
+    			}
     		}
     	}
     	
@@ -65,13 +84,4 @@ $(document).ready(function(){
         xmlHttp.send(null);
         
 	});
-	
-	var updateText = function(jsonString){
-		$.getJSON(jsonString, function(data){
-			$.each(data, function(){
-				//Parse the json string here, update the table by using class selectors and changing the text to red
-			})
-				
-		});
-	};
 })
