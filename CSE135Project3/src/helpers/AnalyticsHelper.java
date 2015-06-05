@@ -321,6 +321,8 @@ import org.json.simple.parser.ParseException;
 				e.printStackTrace();
 			}
 			
+			categoriesItem = "0";
+			action = "run";
 			//Compare the two tables here, first need to run queries to get newTable  (oldTable is old data)
 			HttpServletRequest givenRequest = null;
 			try {
@@ -331,18 +333,21 @@ import org.json.simple.parser.ParseException;
 			}
 			
 			
-			compareTables();
+			String diffs = compareTables();
 			
 		}
 		
-		private void compareTables(){
+		private String compareTables(){
+			String cols = "cols:{";
+			String rows = "rows:{";
+			String items = "items:{";
 			for(Header oldCol : oldTable.colHeaders){
 				for(Header newCol : table.colHeaders){
 					if(oldCol.id == newCol.id){
 						if(oldCol.total == newCol.total){
 							break;
 						} else{
-							//diffs[0][oldCol.id] = newCol.total;
+							cols += "{\"pid\":" + oldCol.id +  ", \"total\":" + newCol.total + "},";
 							break;
 						}
 					}
@@ -355,7 +360,7 @@ import org.json.simple.parser.ParseException;
 						if(oldRow.total == newRow.total){
 							break;
 						} else{
-							//diffs[0][oldRow.id] = newRow.total;
+							rows += "{\"sid\":" + oldRow.id +  ", \"total\":" + newRow.total + "},";
 							break;
 						}
 					}
@@ -373,7 +378,7 @@ import org.json.simple.parser.ParseException;
 			        it.remove(); // avoids a ConcurrentModificationException
 			    }
 
-			
+			return "";
 			
 		}
 }
