@@ -368,6 +368,29 @@ import org.json.simple.parser.ParseException;
 			}
 			
 			    Iterator it = oldTable.itemTotals.entrySet().iterator();
+			    
+			    HashMap<RowCol, Integer> oldTotals = oldTable.itemTotals;
+			    HashMap<RowCol, Integer> newTotals = table.itemTotals;
+			    Set<RowCol> oldKeys = oldTotals.keySet();
+			    Set<RowCol> newKeys = newTotals.keySet();
+			    
+			    for(RowCol o : oldKeys){
+			    	if(newTotals.containsKey(o)){
+			    		int newTotal = newTotals.get(o);
+			    		if(newTotal != oldTotals.get(o)){
+			    			items += "[{\"pid\":" + o.prod_id + ",\"sid\":" + o.state_id + ", \"total\":" + newTotal + "},";
+			    		}
+			    	}
+			    }
+			    
+			    /*for(Header oldRow : oldTable.rowHeaders){
+			    	for(Header oldCol : oldTable.colHeaders){
+			    		RowCol newRC = new RowCol(oldRow.id, oldCol.id);
+			    		if(table.itemTotals.containsKey(newRC)){
+			    			
+			    		}
+			    	}
+			    }
 			    while (it.hasNext()) {
 			        Map.Entry pair = (Map.Entry)it.next();
 			        System.out.println(pair.getKey() + " = " + pair.getValue());
@@ -376,9 +399,9 @@ import org.json.simple.parser.ParseException;
 //			        	//Add to differences
 //			        }
 			        it.remove(); // avoids a ConcurrentModificationException
-			    }
+			    }*/
 
-			return "";
+			return cols + rows + items;
 			
 		}
 }
