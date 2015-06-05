@@ -8,6 +8,7 @@
 	
 	AnalyticsHelper analyzer = new AnalyticsHelper(request);
 	String table = request.getParameter("table");
-	analyzer.parseJSONStringToTable(table);
+	String diffs = analyzer.parseJSONStringToTable(table);
 	System.out.println(table);
 %>
+<%= diffs %>

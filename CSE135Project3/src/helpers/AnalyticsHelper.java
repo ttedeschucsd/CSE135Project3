@@ -285,7 +285,7 @@ import org.json.simple.parser.ParseException;
 			return;
 		}
 		
-		public void parseJSONStringToTable(String tableString){
+		public String parseJSONStringToTable(String tableString){
 			oldTable = new TableHelper();
 			try {
 				JSONParser jP = new JSONParser();
@@ -334,13 +334,14 @@ import org.json.simple.parser.ParseException;
 			
 			
 			String diffs = compareTables();
+			return diffs;
 			
 		}
 		
 		private String compareTables(){
-			String cols = "cols:{";
-			String rows = "rows:{";
-			String items = "items:{";
+			String cols = "cols:[";
+			String rows = "rows:[";
+			String items = "items:[";
 			for(Header oldCol : oldTable.colHeaders){
 				for(Header newCol : table.colHeaders){
 					if(oldCol.id == newCol.id){

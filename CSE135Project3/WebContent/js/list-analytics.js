@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	
 	$('#refresh').click(function(){
 		  var row = {};
 		  var rowHeaders = [];
@@ -53,7 +54,7 @@ $(document).ready(function(){
     	xmlHttp = new XMLHttpRequest();
     	var responseHandler = function(){
     		if(xmlHttp.readyState == 4){
-    			updateText();
+    			updateText(xmlHttp.responseText);
     		}
     	}
     	
@@ -65,8 +66,12 @@ $(document).ready(function(){
         
 	});
 	
-	var updateText = function(){
-//		var colToUpdate = $('.col-header').data("pid", 1);
-//		colToUpdate.attr("style") = "text to red";
-	}
+	var updateText = function(jsonString){
+		$.getJSON(jsonString, function(data){
+			$.each(data, function(){
+				//Parse the json string here, update the table by using class selectors and changing the text to red
+			})
+				
+		});
+	};
 })
