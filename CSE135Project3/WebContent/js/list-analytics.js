@@ -63,7 +63,7 @@ $(document).ready(function(){
     					editCol.html(name + " (" + obj.cols[i].total + ")");
     				}
     				for(i=0; i<obj.rows.length; i++){
-    					var editRow = $(".row-header[data-sid='"+obj.cols[i].pid+"']");
+    					var editRow = $(".row-header[data-sid='"+obj.rows[i].sid+"']");
     					editRow.css('color', 'red');
     					var name = editRow.data("name");
     					editRow.html(name + " (" + obj.rows[i].total + ")");
