@@ -42,7 +42,7 @@ import org.json.simple.parser.ParseException;
 			if(action != null){
 				switch(action){
 					case "precompute":
-						//precomputeData();
+						precomputeData();
 					break;
 					
 					case "run":
@@ -84,7 +84,7 @@ import org.json.simple.parser.ParseException;
 			if(categoriesItem.equalsIgnoreCase("0")){
 				table = new TableHelper();
 				System.out.println("---Entering categoriesItem == 0");
-				String row_all_query = "SELECT sid, sname, total FROM analytics_row_headers_all LIMIT 50";
+				String row_all_query = "SELECT sid, sname, total FROM analytics_row_headers_all ORDER BY total DESC NULLS LAST LIMIT 50";
 				rows = stmt.executeQuery(row_all_query);
 				while (rows.next()) {
 	            	Integer id = rows.getInt(1);
@@ -92,7 +92,7 @@ import org.json.simple.parser.ParseException;
 	                Integer total = rows.getInt(3);
 	                table.addRowHeader(new Header(id, name, total));
 	            }			
-				String col_all_query = "SELECT pid, pname, total FROM analytics_col_headers LIMIT 50";
+				String col_all_query = "SELECT pid, pname, total FROM analytics_col_headers ORDER BY total DESC NULLS LAST LIMIT 50";
 				cols = stmt.executeQuery(col_all_query);
 				while (cols.next()){
 					Integer id = cols.getInt(1);
@@ -104,7 +104,7 @@ import org.json.simple.parser.ParseException;
 			} else {
 				table = new TableHelper();
 				System.out.println("----Entering categoiesItem == " + categoriesItem);
-				String row_one_query = "SELECT sid, sname, total FROM analytics_row_headers_by_category WHERE cid = " + categoriesItem;
+				String row_one_query = "SELECT sid, sname, total FROM analytics_row_headers_by_category WHERE cid = " + categoriesItem + " ORDER BY total DESC NULLS LAST";
 				System.out.println("rows query: " + row_one_query);
 				rows = stmt.executeQuery(row_one_query);
 				while (rows.next()) {
@@ -114,7 +114,7 @@ import org.json.simple.parser.ParseException;
 	                table.addRowHeader(new Header(id, name, total));
 	            }	
 				String col_one_query = "SELECT ac.pid, ac.pname, ac.total FROM analytics_col_headers as ac, products p WHERE "
-						+ "ac.pid = p.id AND p.cid = " + categoriesItem + "LIMIT 50";
+						+ "ac.pid = p.id AND p.cid = " + categoriesItem + " ORDER BY total DESC NULLS LAST LIMIT 50";
 				System.out.println("cols query: " + col_one_query);
 				cols = stmt.executeQuery(col_one_query);
 				while (cols.next()){
@@ -475,8 +475,8 @@ import org.json.simple.parser.ParseException;
 		        while(rs.next()){
 		        	checkTotalInt4 = rs.getInt(1);
 		        }
-		        if(checkTotalInt3 == 0){
-		        	SQL_5 = "UPDATE analytics_prod_x_state SET total = "+ total + " WHERE sid = " + state + " AND pid = " + p.getId();
+		        if(checkTotalInt4 == 0){
+		        	SQL_5 = "UPDATE analytics_prod_x_state SET total = " + total + " WHERE sid = " + state + " AND pid = " + p.getId();
 		        }
 		        else{
 		        	SQL_5 = "UPDATE analytics_prod_x_state SET total = total +" + total + " WHERE sid = " + state + " AND pid = " + p.getId();
