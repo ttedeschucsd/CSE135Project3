@@ -44,6 +44,7 @@
                                 	if (nameNotNull) {
                                 		ShoppingCart cart = PurchaseHelper.obtainCartFromSession(session);
                                         Integer uid = LoginHelper.obtainUserFromSession(session);
+                                	    AnalyticsHelper.addToAnalytics(cart, uid);
                                 	    out.println(PurchaseHelper.purchaseCart(cart, uid));
                                 	} else {
                                 %>
