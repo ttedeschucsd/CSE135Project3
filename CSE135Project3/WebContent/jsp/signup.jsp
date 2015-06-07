@@ -31,7 +31,7 @@
         		document.getElementById("ageError").innerHTML = "";
         	}
         	
-        	if(name != null && name != "" && age >= 1){
+        	if(name != null && name != "" && age != null && age >= 1){
         		duplicateUser();
         	}
         	return submitOK;
@@ -42,13 +42,15 @@
         	var xmlHttp = new XMLHttpRequest();
         	var responseHandler = function(){
         		if(xmlHttp.readyState == 4){
+        			console.log("when readyState == 4");
         			document.getElementById("res").innerHTML = xmlHttp.responseText;
- 					console.log(xmlHttp.responseText);	
+ 					console.log("response? " + xmlHttp.responseText);	
  		
         		}
         	}
+        	//var params ="name=" + document.getElementById("name").value;
         	xmlHttp.onreadystatechange=responseHandler;
-            xmlHttp.open("POST","jsp/verifyUser.jsp?name=" + document.getElementById("name").value, true);
+            xmlHttp.open("POST","jsp/verifyUser.jsp?name=" + document.getElementById("name").value + "&age=" + document.getElementById("age").value + "&role=" + document.getElementById("role").value + "&state=" + document.getElementById("state").value, true);
             xmlHttp.send(null);   
         }
         
@@ -67,10 +69,36 @@
                         </div>
                         <div class="row">
                         <span id="res" style="color:red"></span>
+                        <%
+                            	String name = null, role = null, state = null;
+                            	Integer age = null;
+                            	try {
+                            		name = request.getParameter("name");
+                            	} catch (Exception e) {
+                            		name = null;
+                            	}
+                            	try {
+                            		role = request.getParameter("role");
+                            	} catch (Exception e) {
+                            		role = null;
+                            	}
+                            	try {
+                            		age = Integer.parseInt(request.getParameter("age"));
+                            	} catch (Exception e) {
+                            		age = null;
+                            	}
+                            	try {
+                            		state = request.getParameter("state");
+                            	} catch (Exception e) {
+                            		state = null;
+                            	}
+                            	if (name != null && age != null && role != null && state != null)
+                                    out.println(helpers.SignupHelper.signup(name, age, role, state));
+                            %>
                             <!--jsp:include page="/html/signup-form.html" /-->
                         </div>
                         <div class="container">
-                        <form name="f1" action="signup" method="post" onsubmit="duplicateUser()">
+                        <form name="f1" action="signup" method="post">
                         	<table align="center">
                         		<tr><td></td>
                         			<td><span id="nameError" style="color:red"></span></td>
@@ -158,9 +186,8 @@
                 						</select>
                 					</td>
            		 				</tr>
-           		 				
            		 				<tr>
-                					<td><input onClick="verify();" type="button" value="Signup"></td>
+                					<td><input type="button" onclick="verify()" value="Signup"></td>
             					</tr>
                         	</table>
                         </form>
