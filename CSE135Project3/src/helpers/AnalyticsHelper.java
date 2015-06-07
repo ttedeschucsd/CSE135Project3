@@ -353,7 +353,7 @@ import org.json.simple.parser.ParseException;
 						if(oldCol.total == newCol.total){
 							break;
 						} else{
-							cols += "{\"pid\":" + oldCol.id +  ", \"total\":" + newCol.total + "},";
+							cols += "{\"pid\":" + oldCol.id +  ",\"total\":" + newCol.total + "},";
 							colcount++;
 							break;
 						}
@@ -367,7 +367,7 @@ import org.json.simple.parser.ParseException;
 						if(oldRow.total == newRow.total){
 							break;
 						} else{
-							rows += "{\"sid\":" + oldRow.id +  ", \"total\":" + newRow.total + "},";
+							rows += "{\"sid\":" + oldRow.id +  ",\"total\":" + newRow.total + "},";
 							rowcount++;
 							break;
 						}
@@ -391,13 +391,13 @@ import org.json.simple.parser.ParseException;
 			    	}
 			    }
 			    if(colcount>0){
-			    	cols = cols.replace(cols.substring(cols.length()-1), "");
+			    	cols = cols.substring(0, cols.length()-1);
 			    }
 			    if(rowcount>0){
-			    	rows = rows.replace(rows.substring(rows.length()-1), "");
+			    	rows = rows.substring(0, rows.length()-1);
 			    }
 			    if(itemscount>0){
-			    	items = items.replace(items.substring(items.length()-1), "");
+			    	items = items.substring(0, items.length()-1);
 			    }
 			    
 
@@ -408,7 +408,7 @@ import org.json.simple.parser.ParseException;
 		public static void addToAnalytics(ShoppingCart cart, Integer uid){
 	    	Connection conn = null;
 	        Statement stmt = null;
-	        Integer state = 0, category = 0, checkTotalInt1 = 0, checkTotalInt2 = 0, checkTotalInt3 = 0, checkTotalInt4 = 0;
+	        Integer state = 0, category = 0, checkTotalInt1 = 0, checkTotalInt2 = 0, checkTotalInt3 = 0, checkTotalInt4 = 0, itemId = 0;
 	        String SQL_2 = "", SQL_3 = "", SQL_4 = "", SQL_5 = "";
 	        
 	        try {
@@ -469,18 +469,26 @@ import org.json.simple.parser.ParseException;
 			    	SQL_4 = "UPDATE analytics_row_headers_by_category SET total = total +" + total + " WHERE sid = " + state + " AND cid = " + category;
 		        }
 		    	stmt.execute(SQL_4);
-		    	
-		    	checkTotal = "SELECT total FROM analytics_prod_x_state WHERE sid = " + state + " AND pid = " + p.getId();
-		        rs = stmt.executeQuery(checkTotal);
-		        while(rs.next()){
-		        	checkTotalInt4 = rs.getInt(1);
-		        }
-		        if(checkTotalInt4 == 0){
-		        	SQL_5 = "UPDATE analytics_prod_x_state SET total = " + total + " WHERE sid = " + state + " AND pid = " + p.getId();
-		        }
-		        else{
-		        	SQL_5 = "UPDATE analytics_prod_x_state SET total = total +" + total + " WHERE sid = " + state + " AND pid = " + p.getId();
-		        }
+		    	String checkItem = "SELECT * FROM analytics_prod_x_state WHERE sid = " + state + " AND pid = " + p.getId();
+		    	rs = stmt.executeQuery(checkItem);
+		    	while(rs.next()){
+		    		itemId = rs.getInt(1);
+		    	}
+		    	if(itemId > 0){
+		    		checkTotal = "SELECT total FROM analytics_prod_x_state WHERE sid = " + state + " AND pid = " + p.getId();
+			        rs = stmt.executeQuery(checkTotal);
+			        while(rs.next()){
+			        	checkTotalInt4 = rs.getInt(1);
+			        }
+			        if(checkTotalInt4 == 0){
+			        	SQL_5 = "UPDATE analytics_prod_x_state SET total = " + total + " WHERE sid = " + state + " AND pid = " + p.getId();
+			        }
+			        else{
+			        	SQL_5 = "UPDATE analytics_prod_x_state SET total = total +" + total + " WHERE sid = " + state + " AND pid = " + p.getId();
+			        }
+		    	} else{
+		    		SQL_5 = "INSERT INTO analytics_prod_x_state (pid, sid, total) VALUES (" + p.getId() + ", " + state + ", " + total + ")";
+		    	}
 		    	stmt.execute(SQL_5);
 	        }
 	        } catch (Exception e) {
